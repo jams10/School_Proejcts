@@ -1,0 +1,10 @@
+ch02 : simple Makefile creation project.
+ch08 : simple MultiThreading & Makefile project.
+
+       execute c_news file and type the date of news text file.
+       three categorized file will be created by its topic.
+       
+       MultiThreading Program using Mutex and Conditional Variable.
+
+OS : Linux
+Language : C
