@@ -49,7 +49,10 @@ int main(int argc, char *argv[])
 	struct sockaddr_in clnt_addr;
 	socklen_t clntLen;
 	char buf[BUFSIZE+1];
-	
+	int len = 0;
+	int status = 0; // connection status for closing
+
+	printf("If you type \"close\", close the server\n");	
 	while(1)
 	{	
 		clntLen = sizeof(clnt_addr);
@@ -74,26 +77,49 @@ int main(int argc, char *argv[])
 				printf("Server : Receive error\n");
 				break;
 			}
-			else if(retval == 0) break;
+			else if(retval == 0 || (strncmp(buf, "close", 5) == 0))
+			{
+				status = 1;
+				break;
+			}
 			
 			// print received data
 			buf[retval] = '\0';
-			printf("[TCP/%s:%d] %s\n", inet_ntoa(clnt_addr.sin_addr),
-					ntohs(clnt_addr.sin_port), buf);
+			printf("[From Server] %s\n", buf);
+			
+			// type data
+			memset(buf, 0, sizeof(buf));
+			printf("\n[To Client] : ");
+			if(fgets(buf, BUFSIZE+1, stdin) == NULL) break;
+			
+			if(strncmp(buf, "close", 5) == 0)
+			{
+				status = 1;
+				printf("Close Server...\n");
+				break;
+			}	
+			// remove '\n' letter
+			len = strlen(buf);
+			if(buf[len-1] == '\n') buf[len-1] = '\0';
+			if(strlen(buf) == 0) break;
 
-			// send received data
-			retval = send(clnt_sock, buf, retval, 0);
+			// send
+			retval = send(clnt_sock, buf, BUFSIZE, 0);
 			if(retval < 0)
 			{
 				printf("Server : Send error\n");
 				break;
 			}
 		}
-
+		
 		// close client
 		close(clnt_sock);
 		printf("[TCP Server] Client Closed : IP Address=%s, Port Number=%d\n",
 				inet_ntoa(clnt_addr.sin_addr), ntohs(clnt_addr.sin_port));
+		if(status == 1)
+		{
+			break;
+		}
 	}
 
 	// close server

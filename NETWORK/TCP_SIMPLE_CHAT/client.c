@@ -3,38 +3,26 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 #include <error.h>
 
 #define BUFSIZE 512
-
-int recvn(int s, char *buf, int len, int flags)
-{
-	int received;
-	char *ptr = buf;
-	int left = len;
-
-	while(left > 0)
-	{
-		// recv()
-		received = recv(s, ptr, left, flags);
-		if(received < 0)
-		{
-			return -1;
-		}
-		else if(received == 0) break;
-
-		left -= received;
-		ptr += received;
-	}
-
-	return (len - left);
-}
 
 int main(int argc, char *argv[])
 {
 	if(argc != 3)
 	{
 		printf("Usage : %s <IP> <PORT>\n", argv[0]);
+		exit(1);
+	}
+	
+	struct hostent *host;
+	host = gethostbyname(argv[1]);
+	char *ip = inet_ntoa( *(struct in_addr*)host->h_addr_list[0]);	
+	
+	if((host = gethostbyname(argv[1]) == NULL))
+	{
+		printf("%s is invalid domain\n",argv[1]);
 		exit(1);
 	}
 	
@@ -50,7 +38,7 @@ int main(int argc, char *argv[])
 	struct sockaddr_in serv_addr;
 	memset(&serv_addr, 0, sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = inet_addr(argv[1]);
+	serv_addr.sin_addr.s_addr = inet_addr(ip);
 	serv_addr.sin_port = htons(atoi(argv[2]));
 
 	// connect()
@@ -65,12 +53,18 @@ int main(int argc, char *argv[])
 	int len;
 	int retval;
 
+	printf("If you type \"close\", close the client.\n");	
 	while(1)
 	{
 		// type data
-		printf("\n[data] ");
+		printf("\n[To Server] ");
 		if(fgets(buf, BUFSIZE+1, stdin) == NULL) break;
 		
+		if((strncmp(buf, "close", 5)) == 0)
+		{
+			printf("Close the client...\n");
+			break;
+		}
 		// remove '\n' letter
 		len = strlen(buf);
 		if(buf[len-1] == '\n') buf[len-1] = '\0';
@@ -83,21 +77,22 @@ int main(int argc, char *argv[])
 			printf("Client : Send error\n");
 			exit(1);
 		}
-		printf("[TCP Client] Send %d byte.\n", retval);
 
 		// receive()
-		retval = recvn(sock, buf, retval, 0);
+		retval = recv(sock, buf, BUFSIZE, 0);
 		if(retval < 0)
 		{
 			printf("Client : receive error\n");
 			exit(1);
 		}
-		else if(retval == 0) break;
+		else if(retval == 0 || (strncmp(buf, "close", 5)) == 0)
+		{
+			break;
+		}
 
 		// print received data
 		buf[retval] = '\0';
-		printf("[TCP Client] Received %d byte.\n", retval);
-		printf("[data] %s\n", buf);
+		printf("[From Server] %s\n", buf);
 	}
 
 	// close()
