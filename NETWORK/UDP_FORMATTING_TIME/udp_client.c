@@ -57,7 +57,7 @@ int main(int argc,char **argv)
 	  */
 	memset(&adr_srvr,0,sizeof adr_srvr);
 	adr_srvr.sin_family = AF_INET;
-	adr_srvr.sin_port = htons(9090);
+	adr_srvr.sin_port = htons(9020);
 	adr_srvr.sin_addr.s_addr =
 	inet_addr(srvr_addr);
 	if ( adr_srvr.sin_addr.s_addr == INADDR_NONE )

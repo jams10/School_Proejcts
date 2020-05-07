@@ -26,8 +26,6 @@ static void bail(const char *on_what)
 
 int main(int argc, char **argv)
 {
-	int
-	main(int argc,char **argv) {
 	int z;
 	char *srvr_addr = NULL;
 	struct sockaddr_in adr_inet;	/* AF_INET */
@@ -74,7 +72,7 @@ int main(int argc, char **argv)
 	*/
 	memset(&adr_inet,0,sizeof adr_inet);
 	adr_inet.sin_family = AF_INET;
-	adr_inet.sin_port = htons(9090);
+	adr_inet.sin_port = htons(9020);
 	adr_inet.sin_addr.s_addr = inet_addr(srvr_addr);
 	
 	if ( adr_inet.sin_addr.s_addr == INADDR_NONE )
