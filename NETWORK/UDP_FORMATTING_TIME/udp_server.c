@@ -14,27 +14,30 @@
  * exits back to the shell :
  */
 
-static void bail(const char *on_what)
+static void bail(const char *on_what) 
 {
-	fputs(strerror(errno), stderr);
-	fputs(": ", stderr);
-	fputs(on_what, stderr);
-	fputc('\n', stderr);
+	fputs(strerror(errno),stderr);
+	fputs(": ",stderr);
+	fputs(on_what,stderr);
+	fputc('\n',stderr);
 	exit(1);
 }
+ 
 
 int main(int argc, char **argv)
 {
+	int
+	main(int argc,char **argv) {
 	int z;
 	char *srvr_addr = NULL;
-	struct sockaddr_in adr_inet; // AF_INET
-	struct sockaddr_in adr_clnt; // AF_INET
-	int len_inet;		     // Length
-	int s;                       // Socket
-	char dgram[512];             // Recv buffer
-	char dtfmt[512];             // Date / Time Result
-	time_t td;                   // Current Time and Date
-	struct tm tm;                // Date time values
+	struct sockaddr_in adr_inet;	/* AF_INET */
+	struct sockaddr_in adr_clnt;	/* AF_INET */
+	int len_inet; 			/* length */
+	int s; 				/* Socket */
+	char dgram[512]; 		/* Recv buffer */
+	char dtfmt[512]; 		/* Date/Time Result */
+	time_t td;		 	/* Current Time and Date */
+	struct tm tm; 			/* Date time values */
 
 	/*
 	 * Use a server address from the command line,
@@ -44,47 +47,51 @@ int main(int argc, char **argv)
 	 * 127.0.0.23 :
 	 */
 
-	if( argc >= 2 )
+	if ( argc >= 2 ) 
 	{
-		// Addr on cmdline:
+		/* Addr on cmdline: */
 		srvr_addr = argv[1];
-	}
+	} 
 	else
 	{
-		// Use default address:
+		/* Use default address: */
 		srvr_addr = "127.0.0.23";
 	}
 
 	/*
-	 * Create a UDP socket to use :
-	 */
-	s = socket(AF_INET, SOCK_DGRAM, 0);
-	if( s == -1)
+	* Create a UDP socket to use :
+	*/
+	s = socket(AF_INET,SOCK_DGRAM,0);
+	
+	if ( s == -1 )
 	{
 		bail("socket()");
 	}
-
+	
 	/*
-	 * Create a socket address, for use with bind(2) :
-	 */
-	memset(&adr_inet, 0, sizeof adr_inet);
+	* Create a socket address, for use
+	* with bind(2) :
+	*/
+	memset(&adr_inet,0,sizeof adr_inet);
 	adr_inet.sin_family = AF_INET;
-	adr_inet.sin_port = htons(9020);
+	adr_inet.sin_port = htons(9090);
 	adr_inet.sin_addr.s_addr = inet_addr(srvr_addr);
 	
-	if( adr_inet.sin_addr.s_addr = INADDR_NONE )
+	if ( adr_inet.sin_addr.s_addr == INADDR_NONE )
 	{
 		bail("bad address.");
 	}
-
+	
 	len_inet = sizeof adr_inet;
-
+	
 	/*
-	 * Bind a address to out socket, so that
-	 * client program can contact this server :
-	 */
-	z = bind(s, (struct sockaddr *)&adr_inet,len_inet);
-	if( z == -1 )
+	* Bind a address to our socket, so that
+	* client programs can contact this
+	* server:
+	*/
+	
+	z = bind(s, (struct sockaddr *)&adr_inet, len_inet);
+	if ( z == -1 )
 	{
 		bail("bind()");
 	}
