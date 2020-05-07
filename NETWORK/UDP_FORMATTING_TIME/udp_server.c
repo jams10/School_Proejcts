@@ -95,69 +95,60 @@ int main(int argc, char **argv)
 	}
 
 	/*
-	 * Now wait for request :
-	 */
-	for(;;)
+	* Now wait for requests:
+	*/
+	for (;;) 
 	{
 		/*
-		 * Block until the program receives 
-		 * a datagram at out address and port :
-		 */
+		* Block until the program receives a
+		* datagram at our address and port:
+		*/
 		len_inet = sizeof adr_clnt;
-		z = recvfrom( s,	            // Scoket
-			      dgram,                // Receiving buffer
-			      sizeof dgram,         // Max recv buf size
-			      0,                    // Flags: no options
-			      (struct sockaddr *)&adr_clnt, // Addr
-			      &len_inet             // Addr len, in & out
-			     );
-		if( z < 0 )
-		{
-			bail("recvfrom(2)");
-		}
+		z = recvfrom(s, 		/* Socket */
+		dgram, 				/* Receiving buffer */
+		sizeof dgram, 			/* Max recv buf size */
+		0, 				/* Flags: no options */
+		(struct sockaddr *)&adr_clnt,	/* Addr */
+		&len_inet); 			/* Addr len, in & out */
+		
+		if ( z < 0 ) bail("recvfrom(2)");
 		/*
-		 * Process the request :
+		* Process the request :
+		*/
+		dgram[z] = 0; /* null terminate */
+		 if ( !strcasecmp(dgram,"QUIT") ) break; /* Quit server */
+		 /*
+		 * Get the current date and time:
 		 */
-		dgram[z] = 0;	// Null terminate
-		if( !strcasecmp(dgram, "QUIT"))
-		{
-			break;
-		}
+		 time(&td); 		/* Get current time & date */
+		 tm = *localtime(&td); /* Get components */
 
 		/*
-		 * Get the current date and time :
-		 */
-		time(&td);		// Get current time & date
-		tm = *localtime(&td);   // Get components
-
+		* Format a new date and time string,
+		* based upon the input format string:
+		*/
+		strftime(dtfmt, /* Formatted result */
+		sizeof dtfmt, /* Max result size */
+		dgram, /* Input date/time format */
+		&tm); /* Input date/time values */
+		
 		/*
-		 * Format a new date and time string,
-		 * based upon the input format string:
-		 */
-		strftime(dtfmt,		// Formattetd result
-			 sizeof dtfmt,  // Max result size
-			 dgram,         // Input date / time format
-			 &tm);          // Input date / time values
-
+		* Send the formatted result back to the
+		* client program:
+		*/
+		z = sendto(s, 			/* Socket to send result */
+			   dtfmt, 		/* The datagram result to snd */
+			   strlen(dtfmt), 	/* The datagram lngth */
+			   0, 			/* Flags: no options */
+			   (struct sockaddr *)&adr_clnt,/* addr */
+			   len_inet); 		/* Client address length */
+		
+		if ( z < 0 ) bail("sendto(2)");
+	}
+		
 		/*
-		 * Send the formatted result
-		 * back to the client program :
-		 */
-		z = sendto(s,		   // Socket to send result
-			   dtfmt,          // The datagram result to snd
-			   strlen(dtfmt),  // The datagram length
-			   0,              // Flags: no options
-			   (struct sockaddr *)&adr_clnt, // addr
-			   len_inet);	   // Client address length
-		if ( z < 0 )
-		{
-			bail("sendto(2)");
-		}
-
-		/*
-		 * Close the socket and exit:
-		 */
+		* Close the socket and exit:
+		*/
 		close(s);
 		return 0;
-	}
 }
