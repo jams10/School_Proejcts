@@ -1,0 +1,10 @@
+A typical unix installation
+provides simultaneous
+service at keyboard
+terminals to from 10 to 40 users.
+Such installations have
+rapidly become popular
+because the unix system provides
+provides a software base for writing
+programs to handle a great variety
+of software applications.

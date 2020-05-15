@@ -1,0 +1,11 @@
+The UNIX family has greatly increased the flexibility of the operating system.
+provides simultaneous
+service at keyboard
+terminals to from 10 to 40 users, who may be carrying out different tasks.
+Such installations have
+rapidly become popular
+because the UNIX system provides
+provides a software base for writing
+programs to handle a great variety
+of applications.
+Futhermore, the UNIX system includes very effective tools for writing.

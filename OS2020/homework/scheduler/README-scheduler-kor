@@ -1,0 +1,107 @@
+
+이 scheduler.py 프로그램은 스케줄러들이 응답시간, 반환 시간, 총 대기 시간과 같은 
+스케줄링 계랑(metric)에서 어떻게 돌아가는지 보여 준다.
+
+프로그램 실행에는 두 가지 단계가 있다.
+
+첫번째는, -c flag 없이 실행하는 것이다 : 이는 해답을 보여주지 않고 해결해야할 문제를 보여준다.
+예를들어, 만약 FIFO 정책을 사용하는 세 작업의 대해 응답, 반환, 대기 시간을 계산하고 싶다면
+이를 실행해라 :
+
+  ./scheduler.py -p FIFO -j 3 -s 100
+  
+  만약 동작하지 않는 다면, 이렇게 해봐라:
+    python ./scheduler.py -p FIFO -j 3 -s 100
+
+이는 FIFO 정책으로 실행하는 3가지 작업, 그리고 중요한 것은 100 이라는 특정 랜덤 시드를 지정해준다.
+만약 정확히 이 문제에 대한 해답을 원하면, 정확하게 동일한 랜덤 시드를 다시 지정해야 한다.
+실행해보고 어떤일이 일어나는지 보자. 이와같이 보일것이다:
+
+prompt> ./scheduler.py -p FIFO -j 3 -s 100
+ARG policy FIFO
+ARG jobs 3
+ARG maxlen 10
+ARG seed 100
+
+Here is the job list, with the run time of each job: 
+  Job 0 (length = 1)
+  Job 1 (length = 4)
+  Job 2 (length = 7)
+
+각 작업에 대한 반환시간, 응답시간, 대기 시간을 계산해보아라. 다 되었으면,
+이번에는 -c flag와 함께 다시 실행해보아라 그러면 해답을 제공해준다.
+-s<somenumber> 혹은 당신만의 job list( 예를들어, -l 10,15,20 )를 사용해
+스스로 다른 문제들을 만들어낼수도 있다.
+
+이 예시에서 볼 수 있듯이, 세 개의 작업이 생성된다 : job 0 of length 1, job 1 of length 4, and job 2 of length 7.
+프로그램의 설명에 따라, 이제 이것을 사용해 일부 통계를 계산하고, 기본적인 개념들을 이해했는지 확인할 수 있다.
+
+다 했으면, 같은 프로그램을 사용해 문제를 "해결" 할 수 있고, 맞았는지 확인해 볼 수 있다.
+이렇게 하려면, -c flag를 사용해라. 출력:
+
+prompt> ./scheduler.py -p FIFO -j 3 -s 100 -c
+ARG policy FIFO
+ARG jobs 3
+ARG maxlen 10
+ARG seed 100
+
+Here is the job list, with the run time of each job: 
+  Job 0 (length = 1)
+  Job 1 (length = 4)
+  Job 2 (length = 7)
+
+** Solutions **
+
+Execution trace:
+  [time   0] Run job 0 for 1.00 secs (DONE)
+  [time   1] Run job 1 for 4.00 secs (DONE)
+  [time   5] Run job 2 for 7.00 secs (DONE)
+
+Final statistics:
+  Job   0 -- Response: 0.00  Turnaround 1.00  Wait 0.00
+  Job   1 -- Response: 1.00  Turnaround 5.00  Wait 1.00
+  Job   2 -- Response: 5.00  Turnaround 12.00  Wait 5.00
+
+  Average -- Response: 2.00  Turnaround 6.00  Wait 2.00
+  
+위 결과에서 알 수 있듯이, -c flag는 무슨 일이 일어났는지 보여준다.
+Job  0 은 처음 1초 동안, Job 1은 4초 동안, Job2는 7초 동안 실행되었다.
+그렇게 어렵지 않다. 결국 이것이 FIFO이다. 실행 추적은 이러한 결과를 보여준다.
+
+마지막 통계들도 유용하다: 이들은 "응답 시간"(첫 번째 실행 전 도착 후 작업 대기 시간), 
+"실행 시간(첫 번째 도착 이후 작업 완료에 소요된 시간), 
+총 "대기 시간(준비되었지만 실행되지 않은 시간)을 계산한다. 
+통계는 작업당 표시되며, 그 다음 모든 작업에서 평균으로 표시된다. 
+물론, "-c" flag를 가지고 실행하기 전에 이런 것들을 모두 계산했어야 한다!
+
+만약, 같은 유형의 문제이지만 입력을 다르게 하고 싶으면. 작업 갯수 또는 랜덤시드를
+바꾸거나 둘다 바꿔 보아라. 다른 랜덤 시드는 기본적으로 당신 자신을 위해 무한히 많은
+다른 문제들을 만드는 방법을 제공하고, "-c" flag는 당신만의 작업을 확인할 수 있게 해준다.
+당신이 정말로 개념을 이해했다고 생각이 들때 까지 계속 해보아라.
+
+또 다른 유용한 플래그 하나는 "-l" 인데, 당신이 스케줄하고 싶은 작업을 지정할 수 있게 해준다.
+예를 들어, 만약 5, 10, 15 길이의 세가지 작업에 대해 SJF가 어떻게 동작하느지 알고 싶으면,
+이렇게 실행할 수 있다:
+
+prompt> ./scheduler.py -p SJF -l 5,10,15
+ARG policy SJF
+ARG jlist 5,10,15
+
+Here is the job list, with the run time of each job: 
+  Job 0 (length = 5.0)
+  Job 1 (length = 10.0)
+  Job 2 (length = 15.0)
+...
+
+그리고 다시 -c를 사용해 해답을 볼 수 있다. 당신이 특정 작업들을 지정해 줄때는,
+랜덤시드나 작업의 갯수를 지정해 줄 필요가 없다는 것을 명심해라:
+작업의  길이들은 comma로 분할된 리스트로 부터 받아온다.
+
+물론 SJF(가장 짧은 작업 우선)나 RR(라운드 로빈) 스케줄러를 사용할 때 더 흥미로운 일들이 일어난다.
+시도해보고 한번 봐바라.
+
+그리고 항상 이렇게 실행하면
+
+  ./scheduler.py -h 
+
+플래그들과 옵션들의 리스트를 볼 수 있다.( RR 스케줄러를 위한 타임퀀텀 세팅의 옵션들을 포함. )
