@@ -22,11 +22,51 @@ typedef struct Player
 	char* name;
 }Player;
 
+Node* create( const char* word );
+
+void insert( Node** head, Node** current, Node* new_node );
+
+void freeAll( Node* head, Player* players, int nPlayers );
+
+void display( Node* head );
+
+void start();
+
+int isWordCorret() {}
+
+int main( int argc, char* argv[] )
+{
+	/*
+	List list;
+	list.head = NULL;
+	list.current = NULL;
+	Node* tmp = NULL;
+	char s[20];
+	for( int i = 0; i < 5; i++ )
+	{
+		fgets( s, 20, stdin );
+		if( wordIsIn( list.head, s ) )
+		{
+			tmp = create( s );
+			insert( &list.head, &list.current, tmp );
+			printf( "%s is valid\n", s );
+		}
+		else
+		{
+			printf( "%s is invalid\n", s );
+		}
+	}
+	//display(list.head);
+	freeAll( list.head );
+	*/
+	start();
+}
+
 Node* create( const char* word )
 {
 	Node* p = malloc( sizeof( Node ) );
 
-	if( p == NULL)
+	if( p == NULL )
 	{
 		fprintf( stderr, "Memory allocation error\n" );
 		exit( 1 );
@@ -64,14 +104,14 @@ void insert( Node** head, Node** current, Node* new_node )
 	}
 }
 
-void freeAll( Node *head, Player *players, int nPlayers )
+void freeAll( Node* head, Player* players, int nPlayers )
 {
 	Node* p = head;
 	Node* nextNode = NULL;
 
 	Player* pp = players;
-	
-	while( p!=NULL )
+
+	while( p != NULL )
 	{
 		nextNode = p->next;
 		free( p->word );
@@ -79,11 +119,11 @@ void freeAll( Node *head, Player *players, int nPlayers )
 		p = nextNode;
 	}
 
-	for(int i=0; i<nPlayers; i++)
+	for( int i = 0; i < nPlayers; i++ )
 	{
-		free(pp[i].name);
+		free( pp[i].name );
 	}
-	free(pp);
+	free( pp );
 }
 
 void display( Node* head )
@@ -110,116 +150,79 @@ int wordIsIn( Node* head, const char* word )
 	return 1;
 }
 
-int isWordCorret(){}
-
 void start()
 {
 	/*Set the players*/
-	int nPlayers=0;
+	int nPlayers = 0;
 	char name[20];
-	Player* players=NULL;
+	Player* players = NULL;
 
-	printf("Type the number of players: ");
-	scanf("%d",&nPlayers);
-	
+	printf( "Type the number of players: " );
+	scanf( "%d", &nPlayers );
+
 	getchar();
-		
-	if(nPlayers==0)
+
+	if( nPlayers == 0 )
 	{
 		return;
 	}
-	
-	players = malloc( sizeof(Player) * nPlayers );
 
-	for(int i=0; i<nPlayers; i++)
+	players = malloc( sizeof( Player ) * nPlayers );
+
+	for( int i = 0; i < nPlayers; i++ )
 	{
-		printf( "Type the name of player[%d]: ",i);
+		printf( "Type the name of player[%d]: ", i );
 		fgets( name, 20, stdin );
-		name[strlen(name) - 1]='\0';
-		players[i].name = malloc(strlen(name) + 1);
-		strcpy(players[i].name, name);
+		name[strlen( name ) - 1] = '\0';
+		players[i].name = malloc( strlen( name ) + 1 );
+		strcpy( players[i].name, name );
 		players[i].life = 3;
 	}
 	// You should free players->name and players
-	
+
 	/*Start the game*/
 	List list;
 	list.head = NULL;
 	list.current = NULL;
-	
+
 	Node* tmp = NULL;
-	
+
 	char prev_word[20];
 	char current_word[20];
-	int turn=0;
-	
-	strcpy(prev_word, "start");
+	int turn = 0;
 
-	for(int i=0; i<10; i++)
+	strcpy( prev_word, "start" );
+
+	for( int i = 0; i < 10; i++ )
 	{
 		turn %= 3;
-		
-		printf("\033[32mWord : \033[1;32m%s\n\033[0m",prev_word);
-		printf("Player[\033[31m%d\033[0m] \033[34m%s\033[0m's turn!\n",turn, players[turn].name);
-		printf("Type the word: ");
-		
-		fgets(current_word,20,stdin);
-		current_word[strlen(current_word) - 1] = '\0'; // delete last word ('\n')
-		
-			
-		if(prev_word[strlen(prev_word) - 1] != current_word[0])
+
+		printf( "\033[32mWord : \033[1;32m%s\n\033[0m", prev_word );
+		printf( "Player[\033[31m%d\033[0m] \033[34m%s\033[0m's turn!\n", turn, players[turn].name );
+		printf( "Type the word: " );
+
+		fgets( current_word, 20, stdin );
+		current_word[strlen( current_word ) - 1] = '\0'; // delete last word ('\n')
+
+
+		if( prev_word[strlen( prev_word ) - 1] != current_word[0] )
 		{
-			printf("\033[31mYou typed invalid word!\n\033[0m");
-			printf("Player[\033[31m%d\033[0m] \033[34m%s\033[0m's life has decreased!\n", 
-					turn, players[turn].name);
-			players[turn].life --;
-		}
-		else 
-		{
-			strcpy(prev_word, current_word);
-		}
-		
-		if(players[turn].life==0)
-		{
-			printf("Player[\033[31m%d\033[0m] \033[34m%s\033[0m is dead!\n",turn, players[turn].name);
-			return;
-		}
-		
-		turn++;
-	}
-	
-
-}
-
-int main(int argc, char *argv[])
-{
-	/*
-	List list;
-	list.head = NULL;
-	list.current = NULL;
-
-	Node* tmp = NULL;
-
-	char s[20];
-
-	for( int i = 0; i < 5; i++ )
-	{
-		fgets( s, 20, stdin );
-		if( wordIsIn( list.head, s ) )
-		{
-			tmp = create( s );
-			insert( &list.head, &list.current, tmp );
-			printf( "%s is valid\n", s );
+			printf( "\033[31mYou typed invalid word!\n\033[0m" );
+			printf( "Player[\033[31m%d\033[0m] \033[34m%s\033[0m's life has decreased!\n",
+				turn, players[turn].name );
+			players[turn].life--;
 		}
 		else
 		{
-			printf( "%s is invalid\n", s );
+			strcpy( prev_word, current_word );
 		}
+
+		if( players[turn].life == 0 )
+		{
+			printf( "Player[\033[31m%d\033[0m] \033[34m%s\033[0m is dead!\n", turn, players[turn].name );
+			return;
+		}
+
+		turn++;
 	}
-
-	//display(list.head);
-
-	freeAll( list.head );
-	*/
-	start();
 }
