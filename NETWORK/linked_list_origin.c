@@ -16,12 +16,6 @@ typedef struct List
 	struct Node* current;
 }List;
 
-typedef struct Player
-{
-	int life;
-	char* name;
-}Player;
-
 Node* create( const char* word )
 {
 	Node* p = malloc( sizeof( Node ) );
@@ -64,12 +58,10 @@ void insert( Node** head, Node** current, Node* new_node )
 	}
 }
 
-void freeAll( Node *head, Player *players, int nPlayers )
+void freeAll( Node *head )
 {
 	Node* p = head;
 	Node* nextNode = NULL;
-
-	Player* pp = players;
 	
 	while( p!=NULL )
 	{
@@ -78,12 +70,6 @@ void freeAll( Node *head, Player *players, int nPlayers )
 		free( p );
 		p = nextNode;
 	}
-
-	for(int i=0; i<nPlayers; i++)
-	{
-		free(pp[i].name);
-	}
-	free(pp);
 }
 
 void display( Node* head )
@@ -96,7 +82,7 @@ void display( Node* head )
 	}
 }
 
-int wordIsIn( Node* head, const char* word )
+int isValid( Node* head, const char* word )
 {
 	Node* p = head;
 	while( p != NULL )
@@ -110,79 +96,8 @@ int wordIsIn( Node* head, const char* word )
 	return 1;
 }
 
-int isWordCorret(){}
-
-void start()
-{
-	/*Set the players*/
-	int nPlayers=0;
-	char name[20];
-	Player* players=NULL;
-
-	printf("Type the number of players: ");
-	scanf("%d",&nPlayers);
-	
-	getchar();
-		
-	if(nPlayers==0)
-	{
-		return;
-	}
-	
-	players = malloc( sizeof(Player) * nPlayers );
-
-	for(int i=0; i<nPlayers; i++)
-	{
-		printf( "Type the name of player[%d]: ",i);
-		fgets( name, 20, stdin );
-		name[strlen(name) - 1]='\0';
-		players[i].name = malloc(strlen(name) + 1);
-		strcpy(players[i].name, name);
-		players[i].life = 3;
-	}
-	// You should free players->name and players
-	
-	/*Start the game*/
-	List list;
-	list.head = NULL;
-	list.current = NULL;
-	
-	Node* tmp = NULL;
-	
-	char prev_word[20];
-	char current_word[20];
-	int turn=0;
-	
-	strcpy(prev_word, "start");
-
-	for(int i=0; i<3; i++)
-	{
-		turn %= 3;
-		
-		printf("\033[32mWord : \033[1;32m%s\n\033[0m",prev_word);
-		printf("Player[\033[31m%d\033[0m] \033[34m%s\033[0m's turn!\n",turn, players[turn].name);
-		printf("Type the word: ");
-		
-		fgets(current_word,20,stdin);
-		current_word[strlen(current_word) - 1] = '\0'; // delete last word ('\n')
-		
-			
-		if(prev_word[strlen(prev_word) - 1] != current_word[0])
-		{
-			printf("\033[31mYou typed invalid word!\n\033[0m");
-		}
-
-		strcpy(prev_word,current_word);
-		
-		turn++;
-	}
-	
-
-}
-
 int main(int argc, char *argv[])
 {
-	/*
 	List list;
 	list.head = NULL;
 	list.current = NULL;
@@ -194,7 +109,7 @@ int main(int argc, char *argv[])
 	for( int i = 0; i < 5; i++ )
 	{
 		fgets( s, 20, stdin );
-		if( wordIsIn( list.head, s ) )
+		if( isValid( list.head, s ) )
 		{
 			tmp = create( s );
 			insert( &list.head, &list.current, tmp );
@@ -209,6 +124,4 @@ int main(int argc, char *argv[])
 	//display(list.head);
 
 	freeAll( list.head );
-	*/
-	start();
 }
