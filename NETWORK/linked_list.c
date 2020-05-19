@@ -155,7 +155,7 @@ void start()
 	
 	strcpy(prev_word, "start");
 
-	for(int i=0; i<3; i++)
+	for(int i=0; i<10; i++)
 	{
 		turn %= 3;
 		
@@ -170,9 +170,20 @@ void start()
 		if(prev_word[strlen(prev_word) - 1] != current_word[0])
 		{
 			printf("\033[31mYou typed invalid word!\n\033[0m");
+			printf("Player[\033[31m%d\033[0m] \033[34m%s\033[0m's life has decreased!\n", 
+					turn, players[turn].name);
+			players[turn].life --;
 		}
-
-		strcpy(prev_word,current_word);
+		else 
+		{
+			strcpy(prev_word, current_word);
+		}
+		
+		if(players[turn].life==0)
+		{
+			printf("Player[\033[31m%d\033[0m] \033[34m%s\033[0m is dead!\n",turn, players[turn].name);
+			return;
+		}
 		
 		turn++;
 	}
