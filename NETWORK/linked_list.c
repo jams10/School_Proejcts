@@ -30,6 +30,8 @@ void freeAll( Node* head, Player* players, int nPlayers );
 
 void display( Node* head );
 
+int isWordIn( Node* head, const char* word);
+
 void start();
 
 int isWordCorret() {}
@@ -136,18 +138,18 @@ void display( Node* head )
 	}
 }
 
-int wordIsIn( Node* head, const char* word )
+int isWordIn( Node* head, const char* word )
 {
 	Node* p = head;
 	while( p != NULL )
 	{
 		if( strcmp( p->word, word ) == 0 )
 		{
-			return 0;
+			return 1;
 		}
 		p = p->next;
 	}
-	return 1;
+	return 0;
 }
 
 void start()
@@ -204,7 +206,9 @@ void start()
 		fgets( current_word, 20, stdin );
 		current_word[strlen( current_word ) - 1] = '\0'; // delete last word ('\n')
 
-
+		/* CHECK STRING */
+		// 1
+		/* Compare the first word of current_word with the last word of prev_word. */
 		if( prev_word[strlen( prev_word ) - 1] != current_word[0] )
 		{
 			printf( "\033[31mYou typed invalid word!\n\033[0m" );
@@ -212,11 +216,26 @@ void start()
 				turn, players[turn].name );
 			players[turn].life--;
 		}
+		// 2
+		/* Check if the word is in list. */
+		if( isWordIn( list.head, current_word) )
+		{
+			printf( "\033[31mType word is duplicated!\n\033[0m" );
+			printf( "Player[\033[31m%d\033[0m] \033[34m%s\033[0m's life has decreased!\n",
+				turn, players[turn].name );
+			players[turn].life--;
+		}
+		// 3
+		/* Check if the word is actually in dictionary. */
+
 		else
 		{
+			/* If player type valid word, that word is added to list and change prev_word. */
+			tmp = create( current_word );
+			insert ( &list.head, &list.current, tmp );
 			strcpy( prev_word, current_word );
 		}
-
+		/* If the player's life is 0, that player will be dead. */
 		if( players[turn].life == 0 )
 		{
 			printf( "Player[\033[31m%d\033[0m] \033[34m%s\033[0m is dead!\n", turn, players[turn].name );
