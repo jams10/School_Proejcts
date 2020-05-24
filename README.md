@@ -9,3 +9,8 @@ The projects about Berkely Socket, Thread, Linux, C language.
 
 ## OS2020 : Operation System Class.
 Analyze code about OS.
+
+## Tips
+(Should move Programming_Tips repo)
+
+[Strcmp return value](https://stackoverflow.com/questions/13571907/when-will-strcmp-not-return-1-0-or-1)
