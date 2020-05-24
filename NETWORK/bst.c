@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 	{
 		root_nodes[i] = NULL;
 	}
-	store_words(fp, root_nodes);
+	//store_words(fp, root_nodes);
 	
 	/*
 	char word[20];
@@ -48,8 +48,12 @@ int main(int argc, char* argv[])
 		printf("Found!\n");
 	}
 	*/
-	printf("%s",root_nodes ['a' - 97]->word);
-	preorder(root_nodes [ 'a' - 97 ]);
+	
+	printf("%s",(root_nodes['a' - 97])->word);
+	
+	
+	//preorder(root_nodes [ 'a' - 97 ]);
+	
 
 	/* Close file */
 	fclose(fp);	
@@ -152,6 +156,6 @@ void store_words(FILE *fp, Node* root_nodes[])
 		//printf("%d",buf[0] - 97);
 		//printf("%s",buf);
 		buf[strlen(buf) - 1] = '\0';
-		insert ( root_nodes[ buf[0] - 97 ], buf );
+		insert ( root_nodes[ (int)(buf[0] - 97) ], buf );
 	}
 }
