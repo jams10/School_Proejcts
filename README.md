@@ -13,4 +13,4 @@ Analyze code about OS.
 ## Tips
 (Should move Programming_Tips repo)
 
-[Strcmp return value](https://stackoverflow.com/questions/13571907/when-will-strcmp-not-return-1-0-or-1)
+1. [Strcmp return value](https://stackoverflow.com/questions/13571907/when-will-strcmp-not-return-1-0-or-1)
