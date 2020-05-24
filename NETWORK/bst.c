@@ -47,8 +47,9 @@ int main( int argc, char* argv[] )
 	srand( (unsigned int)time( NULL ) );
 	int num = (int)(rand() % 26);
 
-	printf( "%s\n", root_nodes[num]->word );
-
+	//printf( "%s\n", root_nodes[num]->word );
+	
+		
 	char word[20];
 	printf("Type word : ");
 	fgets(word, 20, stdin);
@@ -61,7 +62,7 @@ int main( int argc, char* argv[] )
 	
 	//printf( "%s", root_nodes['a' - 97]->word );
 
-	//preorder(root_nodes [ 's' - 97 ]);
+	//preorder(root_nodes [ 'a' - 97 ]);
 
 	/* Close file */
 	fclose( fp );
@@ -73,16 +74,17 @@ Node* insert( Node* root, const char* word )
 {
 	if( root == NULL )
 	{
+		fprintf(stdin, "%s\n",word);
 		return create( word );
 	}
 
 	/* word > root->word */
-	if( strcmp( word, root->word ) == 1 )
+	if( strcmp( word, root->word ) > 0 )
 	{
 		root->left = insert( root->left, word );
 	}
 	/* word < root->word */
-	else if( strcmp( word, root->word ) == -1 )
+	else if( strcmp( word, root->word ) < 0 )
 	{
 		root->right = insert( root->right, word );
 	}
@@ -125,7 +127,7 @@ int search( Node* root, const char* word )
 {
 	while( root != NULL )
 	{
-		if( strcmp( word, root->word ) == 1 )
+		if( strcmp( word, root->word ) > 0 )
 		{
 			root = root->left;
 		}
@@ -133,7 +135,7 @@ int search( Node* root, const char* word )
 		{
 			return 1;
 		}
-		else if( strcmp( word, root->word ) == -1 )
+		else if( strcmp( word, root->word ) < 0 )
 		{
 			root = root->right;
 		}
@@ -143,7 +145,7 @@ int search( Node* root, const char* word )
 
 void preorder( const Node* root )
 {
-	if( root )
+	if( root != NULL )
 	{
 		printf( "%s\n", root->word );
 		preorder( root->left );
@@ -153,13 +155,16 @@ void preorder( const Node* root )
 
 void store_words( FILE* fp, Node* root_nodes[] )
 {
-	char buf[20];
+	char buf[32];
 
-	while( fgets( buf, sizeof( buf ), fp ) )
+	while( fgets(buf, 32, fp) )
 	{
 		/* The first character of string - 97 = root_nodes array index */
 		/* Save the word to corresponding binary search tree */
+		
 		buf[strlen( buf ) - 1] = '\0';
+		//printf("%s\n",buf);
 		root_nodes[buf[0] - 97] = insert( root_nodes[buf[0] - 97], buf );
+		//printf("%s",root_nodes[buf[0] - 97]->word);
 	}
 }
