@@ -14,3 +14,4 @@ Analyze code about OS.
 (Should move Programming_Tips repo)
 
 1. [Strcmp return value](https://stackoverflow.com/questions/13571907/when-will-strcmp-not-return-1-0-or-1)
+   In bst.c file strcmp function returned '-7', not -1.
