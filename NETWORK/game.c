@@ -113,7 +113,10 @@ int main( int argc, char* argv[] )
 
 		// 3. Players type the word.
 		if( clistForPlayer.head->life == 0 )
+		{
+			clistForPlayer.head = clistForPlayer.head->next;
 			continue;
+		}
 		char typedWord[20];
 		
 		printf( "\nPlayer : %s's turn!\n", clistForPlayer.head->name );
