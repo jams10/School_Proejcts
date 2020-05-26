@@ -16,17 +16,25 @@ typedef struct List
 	struct Node* current;
 }List;
 
+typedef struct CircularList
+{
+	struct Player* head;
+	struct Player* tail;
+	struct Player* current;
+}CircularList;
+
 typedef struct Player
 {
 	int life;
 	char* name;
+	struct Player* next;
 }Player;
 
 Node* create( const char* word );
 
 void insert( Node** head, Node** current, Node* new_node );
 
-void freeAll( Node* head, Player* players, int nPlayers );
+void freeAllLinkedList( Node* head, Player* players, int nPlayers );
 
 void display( Node* head );
 
@@ -106,7 +114,7 @@ void insert( Node** head, Node** current, Node* new_node )
 	}
 }
 
-void freeAll( Node* head, Player* players, int nPlayers )
+void freeAllLinkedList( Node* head, Player* players, int nPlayers )
 {
 	Node* p = head;
 	Node* nextNode = NULL;

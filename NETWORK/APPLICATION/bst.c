@@ -54,7 +54,7 @@ Node* create( const char* word )
 	return p;
 }
 
-void freeAll( Node* root )
+void freeAllBST( Node* root )
 {
 	if(root == NULL)
 	{

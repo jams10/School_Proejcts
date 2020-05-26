@@ -1,0 +1,19 @@
+<Data>
+
+1. Dictionary words => Binary Search Tree
+2. Players => Dinamically allocated nodes controlled by Circular Linked List
+3. Player typed words => Dinamically allocated nodes controlled by Linked List
+
+<Notification>
+
+1. The structures named by "Node" should be renamed.(duplicated name)
+2. Memory de-allocation check.
+
+<Program structure>
+
+	   words.h				  players.h
+	   words.c				  players.c
+(The bst has words in txt.file)     (Contains players and player typed words)
+		
+				game.c
+			     (Main game)

@@ -6,7 +6,7 @@
 #include <time.h>
 #include "bst.h"
 
-int main( int argc, char* argv[] )
+void start()
 {
 	/* Open file */
 	FILE* fp;
@@ -31,35 +31,7 @@ int main( int argc, char* argv[] )
 	/* Generate random number */
 	srand( (unsigned int)time( NULL ) );
 	int num = (int)(rand() % 26);
-
-	//printf( "%s\n", root_nodes[num]->word );
-	
 		
-	char word[20];
-	printf("Type word : ");
-	fgets(word, 20, stdin);
-	word[strlen(word) - 1] = '\0';
-	int idx = word[0] - 97;
-	if(search(root_nodes[ idx ], word))
-	{
-		printf("Found!\n");
-	}
-	
-	//printf( "%s", root_nodes['a' - 97]->word );
 
-	//preorder(root_nodes [ 'a' - 97 ]);
-	
-	/*  De-allocate words and nodes */
-	for(int i=0; i<26; i++)
-	{
-		freeAll(root_nodes[i]);
-	}
-
-	/* Confirm de-allocation */
-	
-	/*
-	printf("%p\n",*root_nodes[0]);
-	printf("%s\n",root_nodes[0]->word);
-	*/
 }
 

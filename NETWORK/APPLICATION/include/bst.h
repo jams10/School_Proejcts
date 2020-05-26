@@ -18,7 +18,7 @@ Node* create( const char* word );
 
 int search( Node* root, const char* word );
 
-void freeAll( Node* root );
+void freeAllBST( Node* root );
 
 void preorder( const Node* root );
 
