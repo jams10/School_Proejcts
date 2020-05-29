@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 		}
 
 		// print received data
-		buf[retval] = '\0';
+		//buf[retval] = '\0';
 		printf("[From Server] %s\n", buf);
 	}
 
