@@ -28,7 +28,6 @@ typedef struct Player
 
 char prev_word[20];
 
-
 FILE* fp;
 BSTNode* root_BSTnodes[26];
 
@@ -38,8 +37,16 @@ LNode* tmp = NULL;
 int player_id = 0;
 Player* players[MAX_PLAYERS];
 
-
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+void add_Player( Player* p );
+void del_Player( int process_id );
+void send_msg( char* s, int id );
+void send_msg_All( char* s );
+void change_prev_word( char* s );
+void* service( void* arg );
+int valid_check( char* buf );
+void freeMemory();
 
 void main( int argc, char* argv )
 {
