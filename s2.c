@@ -8,34 +8,25 @@
 #include<pthread.h>
 #include<time.h>
 
-#define BUF_SIZE 256
-#define MAX_CLIENT 5
+#define BUF_SIZE 100
+#define MAX_CLNT 100
 #define MAX_IP 30
 
 FILE* fp;
 #define filename "EK57873.txt"
 
-typedef struct User
-{
-    int sockfd;
-    int id;
-    struct sockaddr_in address;
-}User;
-
-User users[MAX_CLIENT];
-
 void* handle_clnt( void* arg );
-void send_msg( char* msg, int len, int id );
+void send_msg( char* msg, int len );
 void error_handling( char* msg );
 char* serverState( int count );
 void menu( char port[] );
-char* search( const char* word);
+
 
 /****************************/
 
 int clnt_cnt = 0;
-int clnt_socks[MAX_CLIENT];
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+int clnt_socks[MAX_CLNT];
+pthread_mutex_t mutex;
 
 int main( int argc, char* argv[] )
 {
@@ -43,13 +34,6 @@ int main( int argc, char* argv[] )
     struct sockaddr_in serv_adr, clnt_adr;
     int clnt_adr_sz;
     pthread_t t_id;
-
-    /* open file */
-    if( (fp = fopen( filename, "r" )) == NULL )
-    {
-	printf("%s open error\n",filename);
-        return(-1);
-    }
 
     /** time log **/
     struct tm* t;
@@ -64,6 +48,7 @@ int main( int argc, char* argv[] )
 
     menu( argv[1] );
 
+    pthread_mutex_init( &mutex, NULL );
     serv_sock = socket( PF_INET, SOCK_STREAM, 0 );
 
     memset( &serv_adr, 0, sizeof( serv_adr ) );
@@ -83,12 +68,7 @@ int main( int argc, char* argv[] )
         clnt_sock = accept( serv_sock, (struct sockaddr*)&clnt_adr, &clnt_adr_sz );
 
         pthread_mutex_lock( &mutex );
-        /*    
-	users[clnt_cnt].id = clnt_cnt;
-        users[clnt_cnt].sockfd = clnt_sock;
-        clnt_cnt++;
-	*/
-	clnt_socks[clnt_cnt++] = clnt_sock;
+        clnt_socks[clnt_cnt++] = clnt_sock;
         pthread_mutex_unlock( &mutex );
 
         pthread_create( &t_id, NULL, handle_clnt, (void*)&clnt_sock );
@@ -98,30 +78,31 @@ int main( int argc, char* argv[] )
             t->tm_hour, t->tm_min );
         printf( " chatter (%d/100)\n", clnt_cnt );
     }
+    fclose( fp );
     close( serv_sock );
     return 0;
 }
 
 void* handle_clnt( void* arg )
 {
-    int clnt_sock=*((int*)arg);
-    int str_len = 0;
+    int clnt_sock = *((int*)arg);
+    int str_len = 0, i;
     char msg[BUF_SIZE];
-    
+
     while( (str_len = read( clnt_sock, msg, sizeof( msg ) )) != 0 )
     {
-        strcpy( msg, search( msg ));
-        send_msg( msg, str_len, 0);
+        strcpy(msg, search( msg ));
+        send_msg( msg, str_len );
     }
 
     // remove disconnected client
     pthread_mutex_lock( &mutex );
-    for( int i = 0; i < clnt_cnt; i++ )
+    for( i = 0; i < clnt_cnt; i++ )
     {
         if( clnt_sock == clnt_socks[i] )
         {
             while( i++ < clnt_cnt - 1 )
-                clnt_socks[i]=clnt_socks[i+1];
+                clnt_socks[i] = clnt_socks[i + 1];
             break;
         }
     }
@@ -131,15 +112,12 @@ void* handle_clnt( void* arg )
     return NULL;
 }
 
-void send_msg( char* msg, int len, int id)
+void send_msg( char* msg, int len )
 {
     int i;
     pthread_mutex_lock( &mutex );
-    
     for( i = 0; i < clnt_cnt; i++ )
-    {
-	write( clnt_socks[i], msg, len );
-    }
+        write( clnt_socks[i], msg, len );
     pthread_mutex_unlock( &mutex );
 }
 
@@ -169,11 +147,11 @@ void menu( char port[] )
     printf( " **** moon/sun chat server ****\n" );
     printf( " server port    : %s\n", port );
     printf( " server state   : %s\n", serverState( clnt_cnt ) );
-    printf( " max connection : %d\n", MAX_CLIENT );
+    printf( " max connection : %d\n", MAX_CLNT );
     printf( " ****          Log         ****\n\n" );
 }
 
-char* search( const char* word )
+char* search( char* word )
 {
     char* str = NULL;
     char temp[256];
