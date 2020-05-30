@@ -8,7 +8,7 @@
 #include<pthread.h>
 #include<time.h>
 
-#define BUF_SIZE 100
+#define BUF_SIZE 256
 #define MAX_CLIENT 5
 #define MAX_IP 30
 
@@ -29,12 +29,12 @@ void send_msg( char* msg, int len, int id );
 void error_handling( char* msg );
 char* serverState( int count );
 void menu( char port[] );
-
+char* search( const char* word);
 
 /****************************/
 
 int clnt_cnt = 0;
-int clnt_socks[MAX_CLNT];
+int clnt_socks[MAX_CLIENT];
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int main( int argc, char* argv[] )
@@ -47,6 +47,7 @@ int main( int argc, char* argv[] )
     /* open file */
     if( (fp = fopen( filename, "r" )) == NULL )
     {
+	printf("%s open error\n",filename);
         return(-1);
     }
 
@@ -82,17 +83,20 @@ int main( int argc, char* argv[] )
         clnt_sock = accept( serv_sock, (struct sockaddr*)&clnt_adr, &clnt_adr_sz );
 
         pthread_mutex_lock( &mutex );
-            users[clnt_cnt].id = clnt_cnt;
-            users[clnt_cnt].sockfd = clnt_sock;
-            clnt_cnt++;
+        /*    
+	users[clnt_cnt].id = clnt_cnt;
+        users[clnt_cnt].sockfd = clnt_sock;
+        clnt_cnt++;
+	*/
+	clnt_socks[clnt_cnt++] = clnt_sock;
         pthread_mutex_unlock( &mutex );
 
-        pthread_create( &t_id, NULL, handle_clnt, (void*)&users[clnt_cnt] );
+        pthread_create( &t_id, NULL, handle_clnt, (void*)&clnt_sock );
         pthread_detach( t_id );
-        //printf( " Connceted client IP : %s ", inet_ntoa( clnt_adr.sin_addr ) );
-        //printf( "(%d-%d-%d %d:%d)\n", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
-        //    t->tm_hour, t->tm_min );
-        //printf( " chatter (%d/100)\n", clnt_cnt );
+        printf( " Connceted client IP : %s ", inet_ntoa( clnt_adr.sin_addr ) );
+        printf( "(%d-%d-%d %d:%d)\n", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
+            t->tm_hour, t->tm_min );
+        printf( " chatter (%d/100)\n", clnt_cnt );
     }
     close( serv_sock );
     return 0;
@@ -100,30 +104,30 @@ int main( int argc, char* argv[] )
 
 void* handle_clnt( void* arg )
 {
-    User user = *((User*)arg);
+    int clnt_sock=*((int*)arg);
     int str_len = 0;
     char msg[BUF_SIZE];
-
-    while( (str_len = read( user.sockfd, msg, sizeof( msg ) )) != 0 )
+    
+    while( (str_len = read( clnt_sock, msg, sizeof( msg ) )) != 0 )
     {
-        search( msg );
-        send_msg( msg, str_len, user.id );
+        strcpy( msg, search( msg ));
+        send_msg( msg, str_len, 0);
     }
 
     // remove disconnected client
     pthread_mutex_lock( &mutex );
     for( int i = 0; i < clnt_cnt; i++ )
     {
-        if( user.sockfd == users[i].sockfd )
+        if( clnt_sock == clnt_socks[i] )
         {
             while( i++ < clnt_cnt - 1 )
-                users[i].sockfd = users[i+1].sockfd;
+                clnt_socks[i]=clnt_socks[i+1];
             break;
         }
     }
     clnt_cnt--;
     pthread_mutex_unlock( &mutex );
-    close( user.sockfd );
+    close( clnt_sock );
     return NULL;
 }
 
@@ -131,12 +135,10 @@ void send_msg( char* msg, int len, int id)
 {
     int i;
     pthread_mutex_lock( &mutex );
+    
     for( i = 0; i < clnt_cnt; i++ )
     {
-        if( id == users[i].id )
-        {
-            write( users[i].sockfd, msg, len );
-        }
+	write( clnt_socks[i], msg, len );
     }
     pthread_mutex_unlock( &mutex );
 }
@@ -171,7 +173,7 @@ void menu( char port[] )
     printf( " ****          Log         ****\n\n" );
 }
 
-char* search( char* word )
+char* search( const char* word )
 {
     char* str = NULL;
     char temp[256];
@@ -195,9 +197,5 @@ char* search( char* word )
     strcpy( str, "There is no word.\n" );
     pthread_mutex_unlock( &mutex );
 
-    if( isIn )
-    {
-        return str;
-    }
-    else return NULL;
+    return str;
 }
