@@ -13,14 +13,14 @@
 #define MAX_IP 30
 
 FILE* fp;
-#define filename "EK57873.txt"
+#define filename "dic.txt"
 
 void* handle_clnt( void* arg );
 void send_msg( char* msg, int len );
 void error_handling( char* msg );
 char* serverState( int count );
 void menu( char port[] );
-
+void search ( char* word, char msg[] );
 
 /****************************/
 
@@ -34,6 +34,11 @@ int main( int argc, char* argv[] )
     struct sockaddr_in serv_adr, clnt_adr;
     int clnt_adr_sz;
     pthread_t t_id;
+	
+    if((fp = fopen(filename, "r")) == NULL) 
+    {
+	return(-1);
+    }
 
     /** time log **/
     struct tm* t;
@@ -88,11 +93,20 @@ void* handle_clnt( void* arg )
     int clnt_sock = *((int*)arg);
     int str_len = 0, i;
     char msg[BUF_SIZE];
+    char msg_out[BUF_SIZE];
+    
+    str_len = read( clnt_sock, msg, sizeof( msg ) );
+    send_msg( msg, str_len);
+
+    memset(msg, BUF_SIZE, 0);
 
     while( (str_len = read( clnt_sock, msg, sizeof( msg ) )) != 0 )
     {
-        strcpy(msg, search( msg ));
-        send_msg( msg, str_len );
+        msg[strlen(msg) - 1]='\0';
+        //printf("%s\n",msg);
+        search( msg, msg_out);
+        send_msg( msg_out, strlen(msg_out));
+	//send_msg( msg, str_len);
     }
 
     // remove disconnected client
@@ -151,12 +165,14 @@ void menu( char port[] )
     printf( " ****          Log         ****\n\n" );
 }
 
-char* search( char* word )
+void search( char* word , char msg[])
 {
-    char* str = NULL;
     char temp[256];
     int count = 0;
     int isIn = 0;
+
+    strcat(word, " ");
+    printf("%s", word);
 
     pthread_mutex_lock( &mutex );
     while( fgets( temp, 256, fp ) != NULL )
@@ -165,15 +181,14 @@ char* search( char* word )
         {
             if( strncmp( temp, word, strlen( word ) ) == 0 && temp[0] == word[0] )
             {
-                rewind( fp );
-                strcpy( str, temp );
+		printf("%s", temp);
+                strcpy( msg, temp );
                 isIn = 1;
             }
             count++;
         }
     }
-    strcpy( str, "There is no word.\n" );
+    rewind(fp);
+    strcpy( msg, "There is no word.\n" );
     pthread_mutex_unlock( &mutex );
-
-    return str;
 }
