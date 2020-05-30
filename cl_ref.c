@@ -47,9 +47,10 @@ void send_msg_handler()
 
 	while( 1 )
 	{
-		//str_overwrite_stdout();
-		printf( "Type : " );
+		str_overwrite_stdout();
+		//printf( "Type : " );
 		fgets( message, LENGTH, stdin );
+		message[strlen(message) - 1] = '\0';
 		//message[strlen( message ) - 1] = '\0';
 		//str_trim_lf( message, LENGTH );
 

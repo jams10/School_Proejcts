@@ -11,7 +11,7 @@
 #include "words.h"
 #include "players.h"
 
-#define MAX_BUF 128
+#define MAX_BUF 64
 #define MAX_PLAYERS 4
 #define IP "127.0.0.1"
 
@@ -27,7 +27,6 @@ typedef struct Player
 }Player;
 
 char prev_word[20];
-
 
 FILE* fp;
 BSTNode* root_BSTnodes[26];
@@ -77,7 +76,6 @@ int main( int argc, char** argv )
 	list.current = NULL;
 
 	// 3. 초기 무작위 단어 선정
-	srand( (unsigned int)time( NULL ) );
 	int num = (int)(rand() % 26);
 	strcpy( prev_word, root_BSTnodes[num]->word );
 
@@ -89,12 +87,11 @@ int main( int argc, char** argv )
 
 	int n_port = atoi( argv[1] );
 	int listening_socket = 0, client_socket = 0;
-	char *ip = "127.0.0.1";
 
 	// Socket()
 	listening_socket = socket( AF_INET, SOCK_STREAM, 0 );
 	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = inet_addr( ip );
+	serv_addr.sin_addr.s_addr = inet_addr( IP );
 	serv_addr.sin_port = htons( n_port );
 
 	// Bind()
@@ -111,7 +108,7 @@ int main( int argc, char** argv )
 		exit( 1 );
 	}
 
-	printf("Word Chain Game!!\n\n");
+	printf( "Word Chain Game!!\n\n" );
 
 	while( 1 )
 	{
@@ -207,19 +204,14 @@ void* service( void* arg )
 	strcpy( p->name, name );
 	
 	// 프린트할 배열에 출력(추후에 메시지로 클라이언트에게 보내기 위함.)
-	sprintf( printing_buf, "Player : %s entered\n", p->name ); 
-	printf( "%s", printing_buf );
-	send_msg( printing_buf, p->id );
+	//sprintf( printing_buf, "Player : %s entered\n", p->name ); 
+	//fprintf( stdin, "%s", printing_buf );
+	//send_msg( printing_buf, p->id );
 
 	memset( printing_buf, 0, MAX_BUF );
-
 	while( 1 )
 	{
-		if( isFirst )
-		{
-			send_msg_All( prev_word );
-			isFirst = 0;
-		}	
+		send_msg( prev_word, p->id);
 		if( isLeft )
 		{
 			break;
@@ -230,30 +222,22 @@ void* service( void* arg )
 		
 		if( check_recv > 0 ) // Player가 정상적으로 메시지 보냄.
 		{
-			if(strlen(printing_buf) > 0)
+			//send_msg( printing_buf, p->id );
+			//printf( "Player : %s typed %s\n", printing_buf, p->name );
+			if( valid_check( printing_buf ) )
 			{
-				//send_msg( printing_buf, p->id );
-				
-				//printf( "Player : %s typed %s\n", printing_buf, p->name );
-				if( valid_check( printing_buf ) )
-				{
-					change_prev_word( printing_buf );
-					printf("Player : %s typed %s\n",p->name, printing_buf);
-					//sprintf( printing_buf, "Player : %s typed %s\n", p->name, printing_buf );
-					send_msg( printing_buf, p->id );
-				
-				}
-				
-				else if( !valid_check( printing_buf ) )
-				{
-					sprintf( printing_buf, "Player : %s typed WRONG!\n", p->name);
-					printf("Player : %s typed %s\n",p->name, printing_buf);
-					send_msg( printing_buf, p->id);
-					p->life--;
-				}
+				change_prev_word( printing_buf );
+				sprintf( printing_buf, "Correct!\n");
+				send_msg( printing_buf, p->id );
+			}
+			else if( !valid_check( printing_buf ) )
+			{
+				sprintf( printing_buf, "WRONG!\n Your life is now %d\n", p->life);
+				send_msg( printing_buf, p->id );
+				p->life--;
 			}
 		}
-		else if (check_recv == 0 || strcmp(printing_buf, "exit") == 0)
+		else
 		{
 			sprintf( printing_buf, "Player : %s left\n", p->name );
 			fprintf( stdin, "%s", printing_buf );
@@ -277,7 +261,6 @@ void* service( void* arg )
 
 int valid_check( char* buf )
 {
-	printf("%s buf\n",buf);
 	if( prev_word != buf )
 	{
 		/// 1) Compare the first letter of typed word with word to solve.
