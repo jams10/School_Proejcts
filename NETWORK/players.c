@@ -33,36 +33,6 @@ LNode* createLNode( const char* word )
 	return p;
 }
 
-Player* createPlayer( const char* name )
-{
-	Player* p = malloc( sizeof( Player ) );
-
-	if( p == NULL )
-	{
-		fprintf( stderr, "Memory allocation error\n" );
-		exit( 1 );
-	}
-	else
-	{
-		p->name = malloc( strlen( name ) + 1 );
-	}
-
-	if( p->name == NULL )
-	{
-		fprintf( stderr, "Memory allocation error\n" );
-		exit( 1 );
-	}
-	else
-	{
-		strcpy( p->name, name );
-		p->next = NULL;
-	}
-
-	p->life = 3;
-
-	return p;
-}
-
 void insertLNode( LNode** head, LNode** current, LNode* new_LNode )
 {
 	if( *head == NULL )
@@ -77,21 +47,6 @@ void insertLNode( LNode** head, LNode** current, LNode* new_LNode )
 	}
 }
 
-void insertPlayer( Player** head, Player** tail, Player* new_Player )
-{
-	if( *head == NULL )
-	{
-		*head = new_Player;
-		*tail = new_Player;
-	}
-	else
-	{
-		(*tail)->next = new_Player;
-		new_Player->next = *head;
-		*tail = new_Player;
-	}
-}
-
 void freeAllList( LNode* head )
 {
 	LNode* p = head;
@@ -103,20 +58,6 @@ void freeAllList( LNode* head )
 		free( p->word );
 		free( p );
 		p = nextLNode;
-	}
-}
-
-void freeAllPlayers( Player* head, int nPlayers)
-{
-	Player* p = head;
-	Player* nextPlayer = NULL;
-
-	for( int i = 0; i < nPlayers; i++ )
-	{
-		nextPlayer = p->next;
-		free( p->name );
-		free( p );
-		p = nextPlayer;
 	}
 }
 
@@ -144,19 +85,3 @@ int isWordIn( LNode* head, const char* word )
 	return 0;
 }
 
-void initPlayers( CircularList* circularList, int nPlayers )
-{
-	circularList->head = NULL;
-	circularList->tail = NULL;
-	Player* player = NULL;
-	char name[20];
-
-	for( int i = 0; i < nPlayers; i++ )
-	{
-		printf( "Type player's name: " );
-		fgets( name, 20, stdin );
-		name[strlen( name ) - 1] = '\0';
-		player = createPlayer( name );
-		insertPlayer( &circularList->head, &circularList->tail, player );
-	}
-}

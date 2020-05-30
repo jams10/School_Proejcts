@@ -2,14 +2,17 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
+#include <unistd.h>
 
 static long shared_value = 0;
 static long result = 0;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void* Thread_f(void *arg)
 {
 	int limit = *((int *) arg);
 	
+	pthread_mutex_lock(&mutex);
 	result = 0;
 	for(int i=0; i<limit; i++)
 	{
@@ -17,7 +20,9 @@ void* Thread_f(void *arg)
 		result--;
 		shared_value = result;
 		//printf("result : %ld shared_value : %ld\n", result, shared_value);
+		//sleep(1);
 	}
+	pthread_mutex_unlock(&mutex);
 
 	return NULL;
 }
@@ -25,35 +30,17 @@ void* Thread_f(void *arg)
 int main(int argc, char* argv[])
 {
 	pthread_t t1, t2;
-	int limit, s;
+	int limit, status;
 
 	limit = atoi(argv[1]);
 
-	s = pthread_create(&t1, NULL, Thread_f, &limit);
-	if(s!=0)
-	{
-		perror("pthread create");
-	}
-	
-	s = pthread_create(&t2, NULL, Thread_f, &limit);
-	if(s!=0)
-	{
-		perror("pthread create");
-	}
+	pthread_create(&t1, NULL, Thread_f, &limit);
+	pthread_create(&t2, NULL, Thread_f, &limit);
 
-	s = pthread_join(t1, NULL);
-	if(s!=0)
-	{
-		perror("pthread_join");
-	}
+	pthread_join(t1, (void*)&status);
+	pthread_join(t2, (void*)&status);
 
-	s = pthread_join(t2, NULL);
-	if(s!=0)
-	{
-		perror("pthread_join");
-	}
-
-	printf("%ld\n",shared_value);
+	printf("%ld\n", shared_value);
 	return 0;
 
 }

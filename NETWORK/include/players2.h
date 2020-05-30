@@ -23,15 +23,34 @@ typedef struct List
 	struct LNode* current;
 }List;
 
+typedef struct Player
+{
+	int life;
+	char* name;
+	struct Player* next;
+}Player;
+
+typedef struct CircularList
+{
+	struct Player* head;
+	struct Player* tail;
+	//struct Player* current;
+}CircularList;
 
 LNode* createLNode( const char* word );
 
+Player* createPlayer( const char* word );
+
 void insertLNode( LNode** head, LNode** current, LNode* new_LNode );
 
+void insertPlayer( Player** head, Player** current, Player* new_Player );
+
 void freeAllList( LNode* head );
+
+void freeAllPlayers( Player* head, int nPlayers );
 
 void display( LNode* head );
 
 int isWordIn( LNode* head, const char* word );
 
-
+void initPlayers( CircularList* circularList, int nPlayers);
