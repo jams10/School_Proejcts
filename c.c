@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#define BUF_SIZE 1024
+#define BUF_SIZE 512
 
 int main( int argc, char** argv )
 {
@@ -36,6 +36,7 @@ int main( int argc, char** argv )
     }
 
     char buf[BUF_SIZE];
+    char buf_out[BUF_SIZE];
     while( 1 )
     {
         memset( buf, 0x00, sizeof( buf ) );
@@ -50,14 +51,14 @@ int main( int argc, char** argv )
             break;
         }
 
-        memset( buf, 0x00, sizeof( buf ) );
-        if( read( client_sock, buf, sizeof( buf ) ) <= 0 )
+        memset( buf_out, 0x00, sizeof( buf_out ) );
+        if( read( client_sock, buf_out, sizeof( buf_out ) ) <= 0 )
         {
             close( client_sock );
             break;
         }
 
-        printf( "read : %s\n", buf );
+        printf( "read : %s\n", buf_out );
     }
 
     return 0;

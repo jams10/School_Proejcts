@@ -1,20 +1,20 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
+#include <pthread.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <string.h>
 #include <wchar.h>
 #include <locale.h>
 
-#define MAX_CLIENT 5
-#define BUF_SIZE 512
+#define MAX_CLIENTS 5
+#define MAX_BUF 512
 
 #define filename "EK57873.txt"
 FILE* fp;
 
-void* t_function( void* data );
+void* service( void* data );
 void search( char* word, char msg[] );
 
 int client_index = 0;
@@ -35,23 +35,26 @@ int main( int argc, char** argv )
     {
         return(-1);
     }
+    
+    struct sockaddr_in serv_addr, clnt_addr;
+	
 
     int server_sock, client_sock;
-    pthread_t thread_client[MAX_CLIENT];
+    pthread_t clients_threads[MAX_CLIENTS];
 
     if( (server_sock = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP )) < 0 )
     {
         printf( "socket create error\n" );
         return -1;
     }
-
+    /*
     int on = 1;
     if( setsockopt( server_sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof( on ) ) < 0 )
     {
         printf( "socket option set error\n" );
         return -1;
     }
-
+    */
     struct sockaddr_in server_addr, client_addr;
     int client_addr_size = sizeof( client_addr );
     server_addr.sin_addr.s_addr = INADDR_ANY;
