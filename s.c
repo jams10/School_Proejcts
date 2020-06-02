@@ -168,7 +168,7 @@ void search( char* word, char msg[] )
         }
     }
     rewind( fp );
-    if(isIn = 0)
+    if(isIn == 0)
     {
 	    strcpy( msg, "There is no word.\n" );
     }

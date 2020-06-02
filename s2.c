@@ -38,7 +38,7 @@ int main( int argc, char** argv )
         return(-1);
     }
     
-    struct sockaddr_in serv_addr, client_addr;
+    struct sockaddr_in server_addr, client_addr;
     int client_addr_len = sizeof( client_addr );
     server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_family = AF_INET;
@@ -81,7 +81,7 @@ int main( int argc, char** argv )
     {
         printf( "Waiting for a client connection request...\n" );
 
-        service_sock = accept( server_sock, (struct sockaddr*)&client_addr, (socklen_t*)&client_addr_size );
+        service_sock = accept( server_sock, (struct sockaddr*)&client_addr, (socklen_t*)&client_addr_len );
         
 	if( service_sock < 0 )
         {
@@ -95,7 +95,7 @@ int main( int argc, char** argv )
             continue;
         }
 
-        if( pthread_create( &thread_client[doing_service_sockets++], NULL, &service, (void*)&service_sock ) != 0 )
+        if( pthread_create( &service_threads[doing_service_sockets++], NULL, &service, (void*)&service_sock ) != 0 )
         {
             printf( "ERROR : Can't create a thread.\n" );
             close( service_sock );
@@ -115,7 +115,7 @@ int main( int argc, char** argv )
 
 }
 
-void* t_function( void* arg )
+void* service( void* arg )
 {
     int service_sock = *((int*)arg);
     pid_t pid = getpid();      // process id
@@ -125,6 +125,9 @@ void* t_function( void* arg )
 
     char buf[MAX_BUF];
     //char buf_out[BUF_SIZE];
+
+    sprintf( buf,"English / Korean Dictionary\nPlease type english word to find.\n" );
+    write( service_sock, buf, sizeof( buf ) );
 
     while( 1 )
     {
@@ -150,7 +153,7 @@ void* t_function( void* arg )
             printf( "Close service socket (number : %d)\n", service_sock);
             
 	    pthread_mutex_lock( &mutex );
-	    client_index--;
+	    doing_service_sockets--;
 	    pthread_mutex_unlock( &mutex );
             
 	    close( service_sock );
@@ -183,7 +186,7 @@ void search( char* word, char msg[] )
         }
     }
     rewind( fp ); // Move the file pointer to the start point.
-    if(isIn = 0)
+    if(isIn == 0)
     {
 	    strcpy( msg, "There is no word.\n" );
     }
