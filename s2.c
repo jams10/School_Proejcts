@@ -53,14 +53,6 @@ int main( int argc, char** argv )
         printf( "ERROR : Can't create a socket.\n" );
         exit(1);
     }
-    /*
-    int on = 1;
-    if( setsockopt( server_sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof( on ) ) < 0 )
-    {
-        printf( "socket option set error\n" );
-        return -1;
-    }
-    */
     
     // Bind()
     if( bind( server_sock, (struct sockaddr*)&server_addr, sizeof( server_addr ) ) < 0 )
