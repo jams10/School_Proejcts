@@ -1,11 +1,11 @@
 #include <stdio.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdlib.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 
-#define BUF_SIZE 512
+#define MAX_BUF 512
 
 int main( int argc, char** argv )
 {
@@ -25,6 +25,7 @@ int main( int argc, char** argv )
 
     struct sockaddr_in client_addr;
     int client_addr_size = sizeof( client_addr );
+
     client_addr.sin_family = AF_INET;
     client_addr.sin_addr.s_addr = inet_addr( argv[1] );
     client_addr.sin_port = htons( atoi( argv[2] ) );
@@ -35,13 +36,19 @@ int main( int argc, char** argv )
         exit( 1 );
     }
 
-    char buf[BUF_SIZE];
-    char buf_out[BUF_SIZE];
+    char buf[MAX_BUF];
+    char buf_out[MAX_BUF];
     while( 1 )
     {
-	/*
-        memset( buf, 0x00, sizeof( buf ) );
-        printf( "write : " );
+        if( read( client_sock, buf, sizeof( buf ) ) <= 0 )
+        {
+            close( client_sock );
+            break;
+        }
+
+        printf( "%s\n", buf );
+        memset( buf, 0, sizeof( buf ) );
+        printf( "type the word : " );
 
         fgets( buf, sizeof( buf ), stdin );
         buf[strlen( buf ) - 1] = '\0';
@@ -51,28 +58,8 @@ int main( int argc, char** argv )
             close( client_sock );
             break;
         }
-	*/
-        //memset( buf_out, 0x00, sizeof( buf_out ) );
-        if( read( client_sock, buf, sizeof( buf ) ) <= 0 )
-        {
-            close( client_sock );
-            break;
-        }
 
-        printf( "read : %s\n", buf );
-	memset( buf, 0, sizeof ( buf ) );
-	printf( "write : ");
-
-	fgets( buf, sizeof( buf ), stdin);
-	buf[strlen( buf ) - 1] = '\0';
-
-	if( write( client_sock, buf, sizeof( buf ) ) <= 0 )
-	{
-	    close( client_sock );
-	    break;
-	}
-
-	memset( buf, 0, sizeof( buf ) );
+        memset( buf, 0, sizeof( buf ) );
     }
 
     return 0;
