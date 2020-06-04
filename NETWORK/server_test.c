@@ -1,4 +1,6 @@
-#include <sys/socket.h>
+//SEE COMMENTS ANG CHAGNE CODES
+
+#include <sys/socket.h>  // change order
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdio.h>
@@ -13,11 +15,11 @@
 #include "words.h"
 #include "players.h"
 
-#define MAX_CLIENTS 5
-#define BUFFER_SZ 2048
+#define MAX_PLAYERS 5 // MAX_CLIENTS -> MAX_PLAYERS
+#define BUFFER_SZ 2048 // change to 512?
 
-static _Atomic unsigned int cli_count = 0;
-static int uid = 10;
+static unsigned int n_players = 0; // staic _Atomic -> static / clnt_count -> n_players
+static int player_id = 10; // uid -> player_id
 static int turn = 0;
 static int round = -1;
 static int isStart = 0;
@@ -26,14 +28,16 @@ static int isStart = 0;
 typedef struct
 {
 	struct sockaddr_in address;
+	char name[32];
 	int sockfd;
-	int uid;
+	int id; // uid -> id
 	int turn;
 	int score;
-	char name[32];
-} client_t;
+} Player_t; // client_t -> Player_t
 
-client_t* clients[MAX_CLIENTS];
+Player_t* players[MAX_PLAYERS]; // client_t* clients[MAX_CLIENTS] -> Player_t* players[MAX_PLAYERS];
+
+// Change the order of variable declaration. Struct should be declared firtst.
 
 char prev_word[20];
 
@@ -46,13 +50,13 @@ LNode* tmp = NULL;
 pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t cons = PTHREAD_COND_INITIALIZER;
 
-void str_overwrite_stdout()
+void str_overwrite_stdout() // Is it necessary?
 {
 	printf( "\r%s", "> " );
 	fflush( stdout );
 }
 
-void str_trim_lf( char* arr, int length )
+void str_trim_lf( char* arr, int length ) // Is it necessary? fgets[strlen(s)-1]='\0' ??
 {
 	int i;
 	for( i = 0; i < length; i++ )
@@ -65,7 +69,7 @@ void str_trim_lf( char* arr, int length )
 	}
 }
 
-void print_client_addr( struct sockaddr_in addr )
+void print_client_addr( struct sockaddr_in addr ) // Is it necessary?
 {
 	printf( "%d.%d.%d.%d",
 		addr.sin_addr.s_addr & 0xff,
@@ -75,7 +79,7 @@ void print_client_addr( struct sockaddr_in addr )
 }
 
 /* Add clients to queue */
-void queue_add( client_t* cl )
+void addPlayer( client_t* cl ) // queue_add -> addPlayer
 {
 	pthread_mutex_lock( &clients_mutex );
 
@@ -92,7 +96,7 @@ void queue_add( client_t* cl )
 }
 
 /* Remove clients to queue */
-void queue_remove( int uid )
+void delPlayer( int id ) // queue_remove -> delPlayer
 {
 	pthread_mutex_lock( &clients_mutex );
 
@@ -112,7 +116,7 @@ void queue_remove( int uid )
 }
 
 /* Send message to all clients except sender */
-void send_message( char* s, int uid )
+void sendMSG( char* s, int id ) // send_message -> sendMSG
 {
 	//pthread_mutex_lock( &clients_mutex );
 
@@ -149,6 +153,8 @@ int valid_check(char* buf)
 			{
 				if(search(root_BSTnodes[buf[0]-97], buf))
 				{
+					/* If the player typed word is valid, insert it to the list 
+					 * for checking duplication */
 					tmp = createLNode(buf);
 					insertLNode(&list.head, &list.current, tmp);
 					return 1;
@@ -168,8 +174,10 @@ void freeMemory()
 	freeAllList(list.head);
 }
 
+// Change the order of function declaration. The functions about words should be declared first.
+
 /* Handle all communication with the client */
-void* handle_client( void* arg )
+void* service( void* arg ) // handle_client -> service
 {
 	char buff_out[BUFFER_SZ];
 	char buff_out2[BUFFER_SZ];
@@ -204,18 +212,19 @@ void* handle_client( void* arg )
 		printf( "%s", buff_out );
 		send_message( buff_out, cli->uid );
 	}
+	/* If the number of connected players is 4, start the game.(wake up the first thread.) */
 	if( cli_count == 4)
 	{
 		pthread_mutex_lock(&clients_mutex);
 		round++;
-		sprintf(buff_out2,"\nWord to solve : %s\n\n", prev_word);
+		sprintf(buff_out2,"\n>>Word to solve : %s\n\n", prev_word);
 		send_message( buff_out2, cli->uid);
 		pthread_mutex_unlock(&clients_mutex);
 		pthread_cond_broadcast(&cons);
 	}
 
 	bzero( buff_out, BUFFER_SZ );
-	bzero( buff_out, BUFFER_SZ );
+	bzero( buff_out2, BUFFER_SZ );
 	while( 1 )
 	{
 		if( leave_flag )
@@ -231,9 +240,11 @@ void* handle_client( void* arg )
 		}
 		printf("%d turn : %d\n",round, cli->turn);
 		
+		/* Server already printed the word to solve when game is just started,
+		 * so do not print the word at fisrt round.*/
 		if(isStart)
 		{	
-			sprintf(buff_out2,"\nWord to solve : %s\n\n", prev_word);
+			sprintf(buff_out2,"\n>>Word to solve : %s\n\n", prev_word);
 			send_message(buff_out2, cli->uid);
 		}
 		else
@@ -242,6 +253,9 @@ void* handle_client( void* arg )
 		}
 		bzero(buff_out2, BUFFER_SZ);
 		
+		/* Send messages about players' score to all players. */
+		/* In the codes below, we don't have to care about race condition
+		 * because all threads are sleeping except for the thread which has turn same as current round. */
 		for(int i=0; i<MAX_CLIENTS; i++)
 		{
 			if(clients[i])
@@ -254,7 +268,8 @@ void* handle_client( void* arg )
 		sprintf(buff_out,"\n");
 		send_message(buff_out, cli->uid);
 		bzero(buff_out, BUFFER_SZ);
-		
+		 
+		/* Print player's turn */
 		sprintf(buff_out,"\nPlayer : %s turn!!\n\n",cli->name);
 		send_message(buff_out, cli->uid);
 		bzero(buff_out, BUFFER_SZ);
@@ -266,6 +281,8 @@ void* handle_client( void* arg )
 			{
 				//buff_out[strlen(buff_out)-1]='\0';
 				printf("%s",buff_out);
+
+				/* If the player typed word is valid, change prev_word and that player scores 10. */
 				if(valid_check( buff_out ) )
 				{
 					change_prev_word( buff_out );
@@ -299,7 +316,8 @@ void* handle_client( void* arg )
 			leave_flag = 1;
 		}
 		bzero( buff_out, BUFFER_SZ );
-		round++;
+		
+		round++; // change round
 		
 		if( round == MAX_CLIENTS - 1)
 		{
@@ -327,7 +345,8 @@ int main( int argc, char** argv )
 		printf( "Usage: %s <port>\n", argv[0] );
 		return EXIT_FAILURE;
 	}
-
+	
+	/* Set the BST for game */
 	if((fp=fopen("./20k.txt", "r"))==NULL)
 	{
 		fprintf(stderr,"File open error.\n");
@@ -340,9 +359,12 @@ int main( int argc, char** argv )
 	}	
 	store_words(fp, root_BSTnodes);
 	fclose(fp);
-
+	
+	/* This list is for checking whether player typed word is duplicated or not. */
 	list.head = NULL;
 	list.current = NULL;
+	
+	/* Set random word for the first round */
 	srand(time(NULL));
 	int num=(int)(rand() % 26);
 	strcpy(prev_word, root_BSTnodes[num]->word);
