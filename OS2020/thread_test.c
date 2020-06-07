@@ -182,7 +182,7 @@ int main( int argc, char** argv )
 	freeAll( list.head );
 
 	result = (float)(end - start) / CLOCKS_PER_SEC;
-	printf( "%f", result );
+	printf( "%f\n", result );
 
 	return 0;
 }
