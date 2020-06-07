@@ -17,4 +17,5 @@ Analyze code about concepts of OS processing, Multithreading.
    In bst.c file strcmp function returned '-7', not -1.
    
 2. Segment fault by stackoverflow in Linux 
+   
    Should decrease size of arrays or allocate arrays dynamically.
