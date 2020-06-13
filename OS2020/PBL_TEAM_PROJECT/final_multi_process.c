@@ -98,8 +98,8 @@ int main( int argc, char** argv )
     fprintf( stdout, "%d 의  약 수 의  개 수 : %d \n", MAX_NUMBER, shmaddr[0] );
 
     printf( "Real time : %.5f sec\n", (double)(t2 - t1) / CLK_TCK );
-    printf( "User time : %.5f sec\n", (double)mytms.tms_utime / CLK_TCK );
-    printf( "System time : %.5f sec\n", (double)mytms.tms_stime / CLK_TCK );
+    printf( "User time : %.5f sec\n", (double)mytms.tms_utime / CLK_TCK + (double)mytms.tms_cutime / CLK_TCK );
+    printf( "System time : %.5f sec\n", (double)mytms.tms_stime / CLK_TCK + (double)mytms.tms_cstime / CLK_TCK );
 
     /* 측정한 시간 printf */
     shmdt( shmaddr );
