@@ -19,3 +19,5 @@ Analyze code about concepts of OS processing, Multithreading.
 2. Segment fault by stackoverflow in Linux 
    
    Should decrease size of arrays or allocate arrays dynamically.
+
+3. [CPU의 코어 쓰레드와 소프트웨어에서의 쓰레드](https://kldp.org/node/154708)
