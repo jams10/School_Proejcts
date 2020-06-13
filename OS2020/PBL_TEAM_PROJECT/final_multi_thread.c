@@ -67,18 +67,11 @@ int main( int argc, char** argv )
     printf( "User time : %.5f sec\n", (double)mytms.tms_utime / CLK_TCK );
     printf( "System time : %.5f sec\n", (double)mytms.tms_stime / CLK_TCK );
     
-            
-      
-    
-
-    
-
     return 0;
 }
 
 void* thread_func( void* arg )
 {
-    /*약수를 구할 수만큼 1부터 roof*/
     while(loopValue<=MAX_NUMBER){
 
         pthread_mutex_lock( (&mutex) );
