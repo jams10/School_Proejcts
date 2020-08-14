@@ -8,7 +8,7 @@ The projects about Makefile, MultiThreading, Linux, C language.
 The projects about Berkely Socket, Thread, Linux, C language.
 
 ## OS2020 : Operation System Class.
-Analyze code about concepts of OS processing, Multithreading.
+Analyze codes about concepts of OS processing, Multithreading.
 
 ## Tips
 (Should move Programming_Tips repo)
