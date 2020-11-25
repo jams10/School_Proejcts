@@ -13,6 +13,7 @@ public:
 	std::vector<std::vector<int>> bridges; // 단절선 벡터
 	int discoverTime[MAX];                 // 발견 시간 테이블
 	bool visited[MAX];                     // DFS에서 사용하는 방문 여부 값 배열
+	bool isEdgeAdded;					   // 간선이 새로 추가되었는지 확인하는 변수
 public:
 	Graph();
 	Graph( const int& nVertices );
