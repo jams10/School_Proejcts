@@ -5,7 +5,8 @@
 
 Graph::Graph()
 	:
-	time( 0 )
+	time( 0 ),
+	isEdgeAdded( false )
 {
 	for( int i = 0; i < 100; ++i )
 	{
@@ -19,7 +20,8 @@ Graph::Graph()
 
 Graph::Graph( const int& nVertices )
 	:
-	time( 0 )
+	time( 0 ),
+	isEdgeAdded( false )
 {
 	// 꼭짓점 벡터 초기화
 	for( int i = 0; i < nVertices; ++i )
@@ -58,7 +60,7 @@ bool Graph::SetConnection( const int& v1, const int& v2 )
 			return false;
 		}
 	}
-
+	isEdgeAdded = true;
 	edges[v1].emplace_back( v2 );
 	edges[v2].emplace_back( v1 );
 	return true;
@@ -79,6 +81,9 @@ void Graph::ShowConnections()
 
 void Graph::MakeTimeTable()
 {
+	// 간선이 새로 추가 되었을 때만 발견 시간 테이블을 새로 작성한다.
+	if( !isEdgeAdded ) return;
+
 	// 이전에 사용했을 경우를 대비해 discoverTime 배열 및 time을 다시 한 번 초기화.
 	time = 0;
 	for( int i = 0; i < vertices.size(); ++i )
@@ -89,6 +94,7 @@ void Graph::MakeTimeTable()
 	if( vertices.size() > 0 )
 	{
 		DfsForTimeTable( 0 );
+		isEdgeAdded = false;
 	}
 	else return;
 }
