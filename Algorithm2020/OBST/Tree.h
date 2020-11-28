@@ -11,11 +11,11 @@ public:
 	/* 좌/우 자식 노드 설정 */
 	void SetLeftChild( Node* lChild );
 	void SetRightChild( Node* rChild );
-	
+
 	/* 좌/우 자식 노드 가져오기 */
 	Node* GetLeftChild();
 	Node* GetRightChild();
-	
+
 	/* 노드 키 가져오기 */
 	int GetKey();
 };
@@ -25,6 +25,7 @@ class Tree
 	Node* root;	// 루트 노드
 	int size;       // 트리 사이즈
 public:
+	Tree();
 	~Tree();
 	// 노드 생성 함수
 	Node* CreateNode( int key );
