@@ -9,6 +9,12 @@ Node::Node( int key_in )
 {
 }
 
+Node::~Node()
+{
+	if( lChild ) delete lChild;
+	if( rChild )delete rChild;
+}
+
 void Node::SetLeftChild( Node* lChild )
 {
 	this->lChild = lChild;
@@ -34,10 +40,16 @@ int Node::GetKey()
 	return this->key;
 }
 
-Node::~Node()
+Tree::Tree()
+	:
+	root( nullptr ),
+	size( 0 )
 {
-	delete lChild;
-	delete rChild;
+}
+
+Tree::~Tree()
+{
+    if (root) delete root;
 }
 
 Node* Tree::CreateNode( int key )
@@ -83,9 +95,4 @@ void Tree::Preorder( Node* node )
 	std::cout << root->GetKey() << " "; 
 	Preorder( root->GetLeftChild() );
 	Preorder( root->GetRightChild() );
-}
-
-Tree::~Tree()
-{
-	delete root;
 }
