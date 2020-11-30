@@ -1,13 +1,15 @@
 # School_Projects
 Things I've learned and made in school.
 
-## AP : Advanced Programming Class. 
+## [AP](https://github.com/jams10/School_Projects/tree/master/AP) : Advanced Programming Class. 
 The projects about Makefile, MultiThreading, Linux, C language.
 
-## NETWORK : Network Socket Programming Class. 
+## [Algorithm2020](https://github.com/jams10/School_Projects/tree/master/Algorithm2020) : Algorithm Class.
+
+## [NETWORK](https://github.com/jams10/School_Projects/tree/master/NETWORK) : Network Socket Programming Class. 
 The projects about Berkely Socket, Thread, Linux, C language.
 
-## OS2020 : Operation System Class.
+## [OS2020](https://github.com/jams10/School_Projects/tree/master/OS2020) : Operation System Class.
 Analyze codes about concepts of OS processing, Multithreading.
 
 ## Tips
