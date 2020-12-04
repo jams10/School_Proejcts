@@ -5,6 +5,7 @@ Things I've learned and made in school.
 The projects about Makefile, MultiThreading, Linux, C language.
 
 ## [Algorithm2020](https://github.com/jams10/School_Projects/tree/master/Algorithm2020) : Algorithm Class.
+The projects about Algorithm.
 
 ## [NETWORK](https://github.com/jams10/School_Projects/tree/master/NETWORK) : Network Socket Programming Class. 
 The projects about Berkely Socket, Thread, Linux, C language.
