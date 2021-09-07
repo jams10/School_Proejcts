@@ -183,7 +183,7 @@ void mergeSort( Node** head )
 		return;
 	}
 
-	/* 1. 리스트 분할 */ // Devide
+	/* 1. 리스트 분할 */ // Divide
 	splitList( *head, &front_split_head, &back_split_head );
 
 	mergeSort( &front_split_head );
